@@ -1,0 +1,197 @@
+<!-- Subject: Fee Receipt — {{semester_name}} | {{reference_number}} -->
+<!-- To: {{to_email}} -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fee Receipt</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F3F4F6;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;">
+
+  <!-- Wrapper Table -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#F3F4F6;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+
+        <!-- Main Container -->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;width:100%;border-radius:8px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+          <!-- Top Banner -->
+          <tr>
+            <td style="background-color:#0A1628;padding:32px 40px;text-align:center;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <p style="margin:0;font-size:11px;letter-spacing:3px;color:#D4A853;text-transform:uppercase;font-weight:700;">Lamrin Tech Skills University Punjab</p>
+                    <p style="margin:6px 0 0;font-size:13px;letter-spacing:1.5px;color:rgba(255,255,255,0.6);text-transform:uppercase;">Fee Management Cell</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Gold Accent Line -->
+          <tr>
+            <td style="background:linear-gradient(90deg,#D4A853,#E8C97A,#D4A853);height:4px;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+          <!-- Content Area -->
+          <tr>
+            <td style="background-color:#FFFFFF;padding:40px 40px 32px;">
+
+              <!-- Heading -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom:28px;">
+                    <h1 style="margin:0;font-size:18px;letter-spacing:2px;color:#0A1628;text-transform:uppercase;font-weight:700;">Semester Registration Fee Receipt</h1>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Approved Badge -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom:28px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="background-color:#ECFDF5;border:2px solid #16A34A;border-radius:50px;padding:10px 28px;">
+                          <span style="color:#16A34A;font-size:15px;font-weight:700;letter-spacing:1px;">&#10003;&ensp;APPROVED</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Greeting -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td style="padding-bottom:24px;">
+                    <p style="margin:0;font-size:15px;color:#374151;line-height:1.6;">Dear <strong style="color:#0A1628;">{{student_name}}</strong>,</p>
+                    <p style="margin:8px 0 0;font-size:15px;color:#374151;line-height:1.6;">Your semester registration fee has been successfully verified and approved. Below are the details of your transaction.</p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Details Table -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border:1px solid #E5E7EB;border-radius:6px;overflow:hidden;">
+                <tr>
+                  <td style="background-color:#0A1628;padding:12px 20px;">
+                    <p style="margin:0;font-size:12px;letter-spacing:1.5px;color:#D4A853;text-transform:uppercase;font-weight:700;">Transaction Details</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <!-- Reference Number -->
+                      <tr>
+                        <td style="padding:12px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">Reference Number</td>
+                        <td style="padding:12px 20px;font-size:14px;color:#0A1628;font-weight:600;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">{{reference_number}}</td>
+                      </tr>
+                      <!-- Roll Number -->
+                      <tr>
+                        <td style="padding:12px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#FFFFFF;border-bottom:1px solid #F3F4F6;">Roll Number</td>
+                        <td style="padding:12px 20px;font-size:14px;color:#0A1628;font-weight:600;background-color:#FFFFFF;border-bottom:1px solid #F3F4F6;">{{roll_number}}</td>
+                      </tr>
+                      <!-- Branch -->
+                      <tr>
+                        <td style="padding:12px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">Branch</td>
+                        <td style="padding:12px 20px;font-size:14px;color:#0A1628;font-weight:600;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">{{branch_name}}</td>
+                      </tr>
+                      <!-- Specialisation -->
+                      <tr>
+                        <td style="padding:12px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#FFFFFF;border-bottom:1px solid #F3F4F6;">Specialisation</td>
+                        <td style="padding:12px 20px;font-size:14px;color:#0A1628;font-weight:600;background-color:#FFFFFF;border-bottom:1px solid #F3F4F6;">{{specialisation_name}}</td>
+                      </tr>
+                      <!-- Section -->
+                      <tr>
+                        <td style="padding:12px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">Section</td>
+                        <td style="padding:12px 20px;font-size:14px;color:#0A1628;font-weight:600;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">{{section_name}}</td>
+                      </tr>
+                      <!-- Batch Year -->
+                      <tr>
+                        <td style="padding:12px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#FFFFFF;border-bottom:1px solid #F3F4F6;">Batch Year</td>
+                        <td style="padding:12px 20px;font-size:14px;color:#0A1628;font-weight:600;background-color:#FFFFFF;border-bottom:1px solid #F3F4F6;">{{batch_year}}</td>
+                      </tr>
+                      <!-- Semester -->
+                      <tr>
+                        <td style="padding:12px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">Semester</td>
+                        <td style="padding:12px 20px;font-size:14px;color:#0A1628;font-weight:600;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">{{semester_name}}</td>
+                      </tr>
+                      <!-- Amount -->
+                      <tr>
+                        <td style="padding:14px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#FFFFFF;border-bottom:1px solid #F3F4F6;">Amount</td>
+                        <td style="padding:14px 20px;font-size:16px;color:#16A34A;font-weight:700;background-color:#FFFFFF;border-bottom:1px solid #F3F4F6;">&#8377;{{fee_amount}}</td>
+                      </tr>
+                      <!-- Approved By -->
+                      <tr>
+                        <td style="padding:12px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">Approved By</td>
+                        <td style="padding:12px 20px;font-size:14px;color:#0A1628;font-weight:600;background-color:#F9FAFB;border-bottom:1px solid #F3F4F6;">{{approved_by_name}}</td>
+                      </tr>
+                      <!-- Date of Approval -->
+                      <tr>
+                        <td style="padding:12px 20px;font-size:13px;color:#6B7280;width:40%;background-color:#FFFFFF;">Date of Approval</td>
+                        <td style="padding:12px 20px;font-size:14px;color:#0A1628;font-weight:600;background-color:#FFFFFF;">{{approved_date}}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Note -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td style="padding:28px 0 0;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="background-color:#F0FDF4;border-left:4px solid #16A34A;border-radius:4px;padding:16px 20px;">
+                          <p style="margin:0;font-size:13px;color:#15803D;line-height:1.6;">You can download your official receipt anytime by visiting the LTSU Fee Portal and using the <strong>Track Request</strong> page with your reference number.</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#0A1628;padding:28px 40px;text-align:center;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <p style="margin:0;font-size:13px;color:#D4A853;font-weight:600;">Lamrin Tech Skills University Punjab</p>
+                    <p style="margin:4px 0 0;font-size:12px;color:rgba(255,255,255,0.5);">Fee Management Cell</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-top:16px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="background-color:rgba(212,168,83,0.15);height:1px;width:80px;font-size:0;line-height:0;">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-top:16px;">
+                    <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.5;">This is an auto-generated email. Please do not reply.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+        <!-- End Main Container -->
+
+      </td>
+    </tr>
+  </table>
+  <!-- End Wrapper -->
+
+</body>
+</html>
