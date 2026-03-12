@@ -141,8 +141,21 @@ export default function SectionManager() {
   }
 
   const handleDelete = async (section) => {
-    if (!window.confirm(`Permanently delete section "${section.name}"?\n\nThis will fail if any students or staff are still assigned to this section. Consider deactivating instead to preserve historical data.`)) return
+    if (!window.confirm(`Permanently delete section "${section.name}"?\n\nConsider deactivating instead to preserve historical data.`)) return
     try {
+      // Pre-check for dependent records
+      const [{ count: stuCount }, { count: staffCount }] = await Promise.all([
+        supabase.from('students').select('id', { count: 'exact', head: true }).eq('section_id', section.id),
+        supabase.from('user_sections').select('id', { count: 'exact', head: true }).eq('section_id', section.id),
+      ])
+      const deps = []
+      if (stuCount > 0) deps.push(`${stuCount} student(s)`)
+      if (staffCount > 0) deps.push(`${staffCount} staff assignment(s)`)
+      if (deps.length > 0) {
+        addToast(`Cannot delete "${section.name}": still has ${deps.join(', ')}. Remove or reassign them first, or deactivate instead.`, 'error')
+        return
+      }
+
       const { error } = await supabase.from('sections').delete().eq('id', section.id)
       if (error) throw error
       await logAction({
@@ -154,7 +167,7 @@ export default function SectionManager() {
       addToast('Section deleted', 'success')
       refetchSections()
     } catch (err) {
-      addToast(err.message || 'Failed to delete. It may have dependent records.', 'error')
+      addToast(err.message || 'Failed to delete section', 'error')
     }
   }
 
