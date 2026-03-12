@@ -43,15 +43,14 @@ const generatePassword = () => {
   return pw.join('')
 }
 
-const genBtnStyle = {
-  position: 'absolute', right: 8, bottom: 14,
-  display: 'inline-flex', alignItems: 'center', gap: 3,
-  padding: '4px 8px', border: '1px solid var(--color-gold)',
-  borderRadius: 6, background: 'rgba(201,168,76,0.10)',
+const genLinkStyle = {
+  display: 'inline-flex', alignItems: 'center', gap: 4,
+  padding: '2px 8px', border: 'none',
+  borderRadius: 4, background: 'rgba(201,168,76,0.10)',
   color: 'var(--color-gold)', fontSize: 11,
   fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
-  transition: 'background 0.15s',
-  lineHeight: 1, zIndex: 2,
+  transition: 'background 0.15s, color 0.15s',
+  lineHeight: 1,
 }
 
 const thStyle = {
@@ -522,83 +521,92 @@ export default function StaffManager() {
 
       {activeTab === 'cr' ? renderTable(crs) : renderTable(teachers)}
 
-      <Modal isOpen={createModal} onClose={() => setCreateModal(false)} title={`Create ${activeTab === 'cr' ? 'CR' : 'Teacher'} Account`}>
-        <Input
-          label="Full Name"
-          value={form.full_name}
-          onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
-          placeholder="e.g. John Doe"
-        />
-        <Input
-          label="Email"
-          type="email"
-          value={form.email}
-          onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-          placeholder="e.g. john@university.edu"
-        />
-        <div style={{ position: 'relative' }}>
+      <Modal isOpen={createModal} onClose={() => setCreateModal(false)} title={`Create ${activeTab === 'cr' ? 'CR' : 'Teacher'} Account`} maxWidth={620}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
           <Input
-            label="Staff ID"
-            value={form.staff_id}
-            onChange={e => setForm(f => ({ ...f, staff_id: e.target.value }))}
-            placeholder="e.g. STF001"
-            style={{ paddingRight: 90 }}
+            label="Full Name"
+            value={form.full_name}
+            onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
+            placeholder="e.g. John Doe"
           />
-          <button
-            type="button"
-            style={genBtnStyle}
-            onClick={() => setForm(f => ({ ...f, staff_id: generateStaffId(activeTab) }))}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.22)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(201,168,76,0.10)'}
-          >
-            <Wand2 size={11} /> Auto
-          </button>
-        </div>
-        <div style={{ position: 'relative' }}>
           <Input
-            label="Password"
-            type="password"
-            value={form.password}
-            onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-            placeholder="Min 6 characters"
-            style={{ paddingRight: 90 }}
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+            placeholder="e.g. john@university.edu"
           />
-          <button
-            type="button"
-            style={genBtnStyle}
-            onClick={() => setForm(f => ({ ...f, password: generatePassword() }))}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.22)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(201,168,76,0.10)'}
-          >
-            <Wand2 size={11} /> Auto
-          </button>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label className="input-label" style={{ marginBottom: 0 }}>Staff ID</label>
+              <button
+                type="button"
+                style={genLinkStyle}
+                onClick={() => setForm(f => ({ ...f, staff_id: generateStaffId(activeTab) }))}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.22)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(201,168,76,0.10)'}
+              >
+                <Wand2 size={11} /> Generate
+              </button>
+            </div>
+            <div className="mb-4">
+              <input
+                className="input-field"
+                value={form.staff_id}
+                onChange={e => setForm(f => ({ ...f, staff_id: e.target.value }))}
+                placeholder="e.g. STF001"
+              />
+            </div>
+          </div>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label className="input-label" style={{ marginBottom: 0 }}>Password</label>
+              <button
+                type="button"
+                style={genLinkStyle}
+                onClick={() => setForm(f => ({ ...f, password: generatePassword() }))}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.22)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(201,168,76,0.10)'}
+              >
+                <Wand2 size={11} /> Generate
+              </button>
+            </div>
+            <Input
+              type="password"
+              value={form.password}
+              onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+              placeholder="Min 6 characters"
+            />
+          </div>
         </div>
 
         <div style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: 16, marginTop: 8 }}>
           <p style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text)', marginBottom: 8 }}>
             {activeTab === 'cr' ? 'Assign Section' : 'Assign Sections'}
           </p>
-          <Select
-            label="Branch"
-            value={form.branch_id}
-            onChange={e => setForm(f => ({ ...f, branch_id: e.target.value, specialisation_id: '', section_id: '' }))}
-            options={branchOptions}
-            placeholder="Select Branch"
-          />
-          <Select
-            label="Specialisation"
-            value={form.specialisation_id}
-            onChange={e => setForm(f => ({ ...f, specialisation_id: e.target.value, section_id: '' }))}
-            options={filteredSpecs.map(s => ({ value: s.id, label: s.name }))}
-            placeholder={form.branch_id ? 'Select Specialisation' : 'Select a branch first'}
-          />
-          <Select
-            label="Section"
-            value={form.section_id}
-            onChange={e => setForm(f => ({ ...f, section_id: e.target.value }))}
-            options={filteredSections.map(s => ({ value: s.id, label: s.name }))}
-            placeholder={form.specialisation_id ? 'Select Section' : 'Select a specialisation first'}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3">
+            <Select
+              label="Branch"
+              value={form.branch_id}
+              onChange={e => setForm(f => ({ ...f, branch_id: e.target.value, specialisation_id: '', section_id: '' }))}
+              options={branchOptions}
+              placeholder="Select Branch"
+            />
+            <Select
+              label="Specialisation"
+              value={form.specialisation_id}
+              onChange={e => setForm(f => ({ ...f, specialisation_id: e.target.value, section_id: '' }))}
+              options={filteredSpecs.map(s => ({ value: s.id, label: s.name }))}
+              placeholder={form.branch_id ? 'Select Spec' : 'Branch first'}
+            />
+            <Select
+              label="Section"
+              value={form.section_id}
+              onChange={e => setForm(f => ({ ...f, section_id: e.target.value }))}
+              options={filteredSections.map(s => ({ value: s.id, label: s.name }))}
+              placeholder={form.specialisation_id ? 'Select Section' : 'Spec first'}
+            />
+          </div>
 
           {activeTab === 'teacher' && (
             <>
@@ -660,7 +668,7 @@ export default function StaffManager() {
       </Modal>
 
       {/* ── Edit Section Assignments Modal ── */}
-      <Modal isOpen={editModal.open} onClose={() => setEditModal({ open: false, user: null })} title={`Edit Sections — ${editModal.user?.full_name || ''}`}>
+      <Modal isOpen={editModal.open} onClose={() => setEditModal({ open: false, user: null })} title={`Edit Sections — ${editModal.user?.full_name || ''}`} maxWidth={560}>
         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', marginBottom: 12 }}>
           Update the section assignments for <strong>{editModal.user?.full_name}</strong> ({editModal.user?.role?.toUpperCase()}).
           {editModal.user?.role === 'cr' ? ' A CR can only be assigned to one section — selecting a new one will replace the current.' : ' A Teacher can be assigned to multiple sections.'}
@@ -700,27 +708,29 @@ export default function StaffManager() {
 
         <div style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: 12 }}>
           <p style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text)', marginBottom: 8 }}>Add Section</p>
-          <Select
-            label="Branch"
-            value={editForm.branch_id}
-            onChange={e => setEditForm(f => ({ ...f, branch_id: e.target.value, specialisation_id: '', section_id: '' }))}
-            options={branchOptions}
-            placeholder="Select Branch"
-          />
-          <Select
-            label="Specialisation"
-            value={editForm.specialisation_id}
-            onChange={e => setEditForm(f => ({ ...f, specialisation_id: e.target.value, section_id: '' }))}
-            options={editFilteredSpecs.map(s => ({ value: s.id, label: s.name }))}
-            placeholder={editForm.branch_id ? 'Select Specialisation' : 'Select a branch first'}
-          />
-          <Select
-            label="Section"
-            value={editForm.section_id}
-            onChange={e => setEditForm(f => ({ ...f, section_id: e.target.value }))}
-            options={editFilteredSections.map(s => ({ value: s.id, label: s.name }))}
-            placeholder={editForm.specialisation_id ? 'Select Section' : 'Select a specialisation first'}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3">
+            <Select
+              label="Branch"
+              value={editForm.branch_id}
+              onChange={e => setEditForm(f => ({ ...f, branch_id: e.target.value, specialisation_id: '', section_id: '' }))}
+              options={branchOptions}
+              placeholder="Select Branch"
+            />
+            <Select
+              label="Specialisation"
+              value={editForm.specialisation_id}
+              onChange={e => setEditForm(f => ({ ...f, specialisation_id: e.target.value, section_id: '' }))}
+              options={editFilteredSpecs.map(s => ({ value: s.id, label: s.name }))}
+              placeholder={editForm.branch_id ? 'Select Spec' : 'Branch first'}
+            />
+            <Select
+              label="Section"
+              value={editForm.section_id}
+              onChange={e => setEditForm(f => ({ ...f, section_id: e.target.value }))}
+              options={editFilteredSections.map(s => ({ value: s.id, label: s.name }))}
+              placeholder={editForm.specialisation_id ? 'Select Section' : 'Spec first'}
+            />
+          </div>
           <Button variant="secondary" onClick={addEditSection} style={{ marginTop: 4, padding: '6px 14px', fontSize: 'var(--text-sm)' }}>
             {editModal.user?.role === 'cr' ? 'Set Section' : '+ Add Section'}
           </Button>
