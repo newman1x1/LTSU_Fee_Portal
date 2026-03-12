@@ -107,8 +107,21 @@ export default function SemesterManager() {
   }
 
   const handleDelete = async (semester) => {
-    if (!window.confirm(`Permanently delete semester "${semester.name}"?\n\n⚠️ This will fail if any fee requests or sections reference this semester. Deleting semesters with past data is NOT recommended. Consider deactivating instead.`)) return
+    if (!window.confirm(`Permanently delete semester "${semester.name}"?\n\nConsider deactivating instead to preserve historical data.`)) return
     try {
+      // Pre-check for dependent records
+      const [{ count: secCount }, { count: feeCount }] = await Promise.all([
+        supabase.from('sections').select('id', { count: 'exact', head: true }).eq('semester_id', semester.id),
+        supabase.from('fee_requests').select('id', { count: 'exact', head: true }).eq('semester_id', semester.id),
+      ])
+      const deps = []
+      if (secCount > 0) deps.push(`${secCount} section(s)`)
+      if (feeCount > 0) deps.push(`${feeCount} fee request(s)`)
+      if (deps.length > 0) {
+        addToast(`Cannot delete "${semester.name}": still has ${deps.join(', ')}. Remove them first, or deactivate instead.`, 'error')
+        return
+      }
+
       const { error } = await supabase.from('semesters').delete().eq('id', semester.id)
       if (error) throw error
       await logAction({
@@ -120,7 +133,7 @@ export default function SemesterManager() {
       addToast('Semester deleted', 'success')
       refetchSemesters()
     } catch (err) {
-      addToast(err.message || 'Failed to delete. It may have dependent records.', 'error')
+      addToast(err.message || 'Failed to delete semester', 'error')
     }
   }
 
