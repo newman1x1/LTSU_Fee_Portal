@@ -215,8 +215,9 @@ export default function StaffManager() {
         },
       })
 
-      if (fnError) throw fnError
-      if (result?.error) throw new Error(result.error)
+      if (fnError || result?.error) {
+        throw new Error(result?.error || fnError?.message || 'Failed to create account')
+      }
 
       await logAction({
         actionType: role === 'cr' ? 'admin_created_cr' : 'admin_created_teacher',
@@ -251,8 +252,9 @@ export default function StaffManager() {
         },
       })
 
-      if (fnError) throw fnError
-      if (result?.error) throw new Error(result.error)
+      if (fnError || result?.error) {
+        throw new Error(result?.error || fnError?.message || 'Failed to reset password')
+      }
 
       await logAction({
         actionType: 'admin_reset_password',
@@ -304,8 +306,9 @@ export default function StaffManager() {
       const { data: result, error: fnError } = await supabase.functions.invoke('admin-actions', {
         body: { action: 'deactivate_user', userId: user.id },
       })
-      if (fnError) throw fnError
-      if (result?.error) throw new Error(result.error)
+      if (fnError || result?.error) {
+        throw new Error(result?.error || fnError?.message || 'Failed to deactivate account')
+      }
 
       const { error: delErr } = await supabase.from('users').delete().eq('id', user.id)
       if (delErr) throw delErr
@@ -353,10 +356,20 @@ export default function StaffManager() {
       addToast('Section already added', 'warning')
       return
     }
-    const isCr = editModal.user?.role === 'cr'
     setEditForm(f => ({
       ...f,
-      assignedSections: isCr ? [sec] : [...f.assignedSections, sec],
+      assignedSections: [...f.assignedSections, sec],
+      section_id: '',
+    }))
+  }
+
+  const handleEditSectionSelectForCr = (sectionId) => {
+    if (!sectionId) return
+    const sec = sections.find(s => s.id === sectionId)
+    if (!sec) return
+    setEditForm(f => ({
+      ...f,
+      assignedSections: [sec],
       section_id: '',
     }))
   }
@@ -410,9 +423,9 @@ export default function StaffManager() {
         },
       })
 
+      await fetchUsers()
       addToast(`Section assignments updated for ${user.full_name}`, 'success')
       setEditModal({ open: false, user: null })
-      fetchUsers()
     } catch (err) {
       addToast(err.message || 'Failed to update section assignments', 'error')
     } finally {
@@ -670,71 +683,125 @@ export default function StaffManager() {
       {/* ── Edit Section Assignments Modal ── */}
       <Modal isOpen={editModal.open} onClose={() => setEditModal({ open: false, user: null })} title={`Edit Sections — ${editModal.user?.full_name || ''}`} maxWidth={560}>
         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', marginBottom: 12 }}>
-          Update the section assignments for <strong>{editModal.user?.full_name}</strong> ({editModal.user?.role?.toUpperCase()}).
-          {editModal.user?.role === 'cr' ? ' A CR can only be assigned to one section — selecting a new one will replace the current.' : ' A Teacher can be assigned to multiple sections.'}
+          {editModal.user?.role === 'cr'
+            ? <>Update the assigned section for <strong>{editModal.user?.full_name}</strong>. A CR is assigned to exactly one section — pick a new one below to replace it.</>
+            : <>Update sections for <strong>{editModal.user?.full_name}</strong>. A Teacher can be assigned to multiple sections.</>
+          }
         </p>
 
-        {/* Current assigned sections */}
-        {editForm.assignedSections.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-            {editForm.assignedSections.map(sec => (
-              <span
-                key={sec.id}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  padding: '4px 10px',
-                  borderRadius: 6,
-                  background: 'var(--color-border-light)',
-                  fontSize: 'var(--text-xs)',
-                  color: 'var(--color-text)',
-                }}
-              >
-                {sec.name} ({sec.branches?.name || branches.find(b => b.id === sec.branch_id)?.name || ''} · {sec.specialisations?.name || specs.find(sp => sp.id === sec.specialisation_id)?.name || ''})
-                <button
-                  onClick={() => removeEditSection(sec.id)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: 'var(--color-error)' }}
-                >
-                  <X size={12} />
-                </button>
-              </span>
-            ))}
+        {/* ─ CR: Simple single-section picker ─ */}
+        {editModal.user?.role === 'cr' && (
+          <div>
+            {editForm.assignedSections.length > 0 && (
+              <div style={{ marginBottom: 12 }}>
+                <p style={{ fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--color-text-muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Current Section</p>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '6px 14px', borderRadius: 8,
+                  background: 'rgba(46,158,107,0.10)', border: '1px solid rgba(46,158,107,0.25)',
+                  fontSize: 'var(--text-sm)', color: 'var(--color-success)', fontWeight: 500,
+                }}>
+                  {editForm.assignedSections[0].name}
+                  <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>
+                    ({editForm.assignedSections[0].branches?.name || branches.find(b => b.id === editForm.assignedSections[0].branch_id)?.name || ''} · {editForm.assignedSections[0].specialisations?.name || specs.find(sp => sp.id === editForm.assignedSections[0].specialisation_id)?.name || ''})
+                  </span>
+                </div>
+              </div>
+            )}
+            {editForm.assignedSections.length === 0 && (
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-error)', marginBottom: 12 }}>No section assigned. Select one below.</p>
+            )}
+
+            <div style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: 12 }}>
+              <p style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text)', marginBottom: 8 }}>Change Section</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3">
+                <Select
+                  label="Branch"
+                  value={editForm.branch_id}
+                  onChange={e => setEditForm(f => ({ ...f, branch_id: e.target.value, specialisation_id: '', section_id: '' }))}
+                  options={branchOptions}
+                  placeholder="Select Branch"
+                />
+                <Select
+                  label="Specialisation"
+                  value={editForm.specialisation_id}
+                  onChange={e => setEditForm(f => ({ ...f, specialisation_id: e.target.value, section_id: '' }))}
+                  options={editFilteredSpecs.map(s => ({ value: s.id, label: s.name }))}
+                  placeholder={editForm.branch_id ? 'Select Spec' : 'Branch first'}
+                />
+                <Select
+                  label="Section"
+                  value={editForm.section_id}
+                  onChange={e => handleEditSectionSelectForCr(e.target.value)}
+                  options={editFilteredSections.map(s => ({ value: s.id, label: s.name }))}
+                  placeholder={editForm.specialisation_id ? 'Select Section' : 'Spec first'}
+                />
+              </div>
+            </div>
           </div>
-        )}
-        {editForm.assignedSections.length === 0 && (
-          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-error)', marginBottom: 12 }}>No sections assigned. Add at least one.</p>
         )}
 
-        <div style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: 12 }}>
-          <p style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text)', marginBottom: 8 }}>Add Section</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3">
-            <Select
-              label="Branch"
-              value={editForm.branch_id}
-              onChange={e => setEditForm(f => ({ ...f, branch_id: e.target.value, specialisation_id: '', section_id: '' }))}
-              options={branchOptions}
-              placeholder="Select Branch"
-            />
-            <Select
-              label="Specialisation"
-              value={editForm.specialisation_id}
-              onChange={e => setEditForm(f => ({ ...f, specialisation_id: e.target.value, section_id: '' }))}
-              options={editFilteredSpecs.map(s => ({ value: s.id, label: s.name }))}
-              placeholder={editForm.branch_id ? 'Select Spec' : 'Branch first'}
-            />
-            <Select
-              label="Section"
-              value={editForm.section_id}
-              onChange={e => setEditForm(f => ({ ...f, section_id: e.target.value }))}
-              options={editFilteredSections.map(s => ({ value: s.id, label: s.name }))}
-              placeholder={editForm.specialisation_id ? 'Select Section' : 'Spec first'}
-            />
+        {/* ─ Teacher: Multi-section chips + add button ─ */}
+        {editModal.user?.role === 'teacher' && (
+          <div>
+            {editForm.assignedSections.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                {editForm.assignedSections.map(sec => (
+                  <span
+                    key={sec.id}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      padding: '4px 10px', borderRadius: 6,
+                      background: 'var(--color-border-light)',
+                      fontSize: 'var(--text-xs)', color: 'var(--color-text)',
+                    }}
+                  >
+                    {sec.name} ({sec.branches?.name || branches.find(b => b.id === sec.branch_id)?.name || ''} · {sec.specialisations?.name || specs.find(sp => sp.id === sec.specialisation_id)?.name || ''})
+                    <button
+                      onClick={() => removeEditSection(sec.id)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', color: 'var(--color-error)' }}
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            {editForm.assignedSections.length === 0 && (
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-error)', marginBottom: 12 }}>No sections assigned. Add at least one.</p>
+            )}
+
+            <div style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: 12 }}>
+              <p style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text)', marginBottom: 8 }}>Add Section</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-3">
+                <Select
+                  label="Branch"
+                  value={editForm.branch_id}
+                  onChange={e => setEditForm(f => ({ ...f, branch_id: e.target.value, specialisation_id: '', section_id: '' }))}
+                  options={branchOptions}
+                  placeholder="Select Branch"
+                />
+                <Select
+                  label="Specialisation"
+                  value={editForm.specialisation_id}
+                  onChange={e => setEditForm(f => ({ ...f, specialisation_id: e.target.value, section_id: '' }))}
+                  options={editFilteredSpecs.map(s => ({ value: s.id, label: s.name }))}
+                  placeholder={editForm.branch_id ? 'Select Spec' : 'Branch first'}
+                />
+                <Select
+                  label="Section"
+                  value={editForm.section_id}
+                  onChange={e => setEditForm(f => ({ ...f, section_id: e.target.value }))}
+                  options={editFilteredSections.map(s => ({ value: s.id, label: s.name }))}
+                  placeholder={editForm.specialisation_id ? 'Select Section' : 'Spec first'}
+                />
+              </div>
+              <Button variant="secondary" onClick={addEditSection} style={{ marginTop: 4, padding: '6px 14px', fontSize: 'var(--text-sm)' }}>
+                + Add Section
+              </Button>
+            </div>
           </div>
-          <Button variant="secondary" onClick={addEditSection} style={{ marginTop: 4, padding: '6px 14px', fontSize: 'var(--text-sm)' }}>
-            {editModal.user?.role === 'cr' ? 'Set Section' : '+ Add Section'}
-          </Button>
-        </div>
+        )}
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
           <Button variant="ghost" onClick={() => setEditModal({ open: false, user: null })}>Cancel</Button>
