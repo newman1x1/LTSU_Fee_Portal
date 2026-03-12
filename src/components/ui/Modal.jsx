@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
 
-export default function Modal({ isOpen, onClose, title, children }) {
+export default function Modal({ isOpen, onClose, title, children, maxWidth = 480 }) {
   const previousFocusRef = useRef(null)
   const modalRef = useRef(null)
 
@@ -65,7 +65,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
         ref={modalRef}
         className="glass-card fade-in"
         style={{
-          maxWidth: 480,
+          maxWidth,
           width: '100%',
           padding: 24,
           background: 'var(--color-white)',
