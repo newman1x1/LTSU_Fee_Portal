@@ -123,8 +123,23 @@ export default function BranchManager() {
   }
 
   const handleDelete = async (branch) => {
-    if (!window.confirm(`Permanently delete branch "${branch.name}"?\n\nThis will fail if any specialisations, sections, or students still reference this branch. Consider deactivating instead to preserve historical data.`)) return
+    if (!window.confirm(`Permanently delete branch "${branch.name}"?\n\nConsider deactivating instead to preserve historical data.`)) return
     try {
+      // Pre-check for dependent records
+      const [{ count: specCount }, { count: secCount }, { count: stuCount }] = await Promise.all([
+        supabase.from('specialisations').select('id', { count: 'exact', head: true }).eq('branch_id', branch.id),
+        supabase.from('sections').select('id', { count: 'exact', head: true }).eq('branch_id', branch.id),
+        supabase.from('students').select('id', { count: 'exact', head: true }).eq('branch_id', branch.id),
+      ])
+      const deps = []
+      if (specCount > 0) deps.push(`${specCount} specialisation(s)`)
+      if (secCount > 0) deps.push(`${secCount} section(s)`)
+      if (stuCount > 0) deps.push(`${stuCount} student(s)`)
+      if (deps.length > 0) {
+        addToast(`Cannot delete "${branch.name}": still has ${deps.join(', ')}. Remove or reassign them first, or deactivate this branch instead.`, 'error')
+        return
+      }
+
       const { error } = await supabase.from('branches').delete().eq('id', branch.id)
       if (error) throw error
       await logAction({
@@ -136,7 +151,7 @@ export default function BranchManager() {
       addToast('Branch deleted', 'success')
       refetchBranches()
     } catch (err) {
-      addToast(err.message || 'Failed to delete branch. It may have dependent records.', 'error')
+      addToast(err.message || 'Failed to delete branch', 'error')
     }
   }
 
