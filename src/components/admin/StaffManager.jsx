@@ -298,20 +298,14 @@ export default function StaffManager() {
   }
 
   const handleDelete = async (user) => {
-    if (!window.confirm(`Permanently delete ${user.role.toUpperCase()} account "${user.full_name}"?\n\nThis will remove their section assignments and deactivate their auth account. Any fee requests they previously reviewed will lose their reviewer reference.\n\nConsider deactivating instead to preserve audit history.`)) return
+    if (!window.confirm(`Permanently delete ${user.role.toUpperCase()} account "${user.full_name}"?\n\nThis will remove their section assignments, user profile, and auth account. Any fee requests they previously reviewed will lose their reviewer reference.\n\nConsider deactivating instead to preserve audit history.`)) return
     try {
-      const { error: secErr } = await supabase.from('user_sections').delete().eq('user_id', user.id)
-      if (secErr) throw secErr
-
       const { data: result, error: fnError } = await supabase.functions.invoke('admin-actions', {
-        body: { action: 'deactivate_user', userId: user.id },
+        body: { action: 'delete_user', userId: user.id },
       })
       if (fnError || result?.error) {
-        throw new Error(result?.error || fnError?.message || 'Failed to deactivate account')
+        throw new Error(result?.error || fnError?.message || 'Failed to delete account')
       }
-
-      const { error: delErr } = await supabase.from('users').delete().eq('id', user.id)
-      if (delErr) throw delErr
 
       await logAction({
         actionType: 'admin_deleted_staff',
