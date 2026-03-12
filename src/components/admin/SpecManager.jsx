@@ -131,8 +131,21 @@ export default function SpecManager() {
   }
 
   const handleDelete = async (spec) => {
-    if (!window.confirm(`Permanently delete specialisation "${spec.name}"?\n\nThis will fail if any sections or students still reference this specialisation. Consider deactivating instead to preserve historical data.`)) return
+    if (!window.confirm(`Permanently delete specialisation "${spec.name}"?\n\nConsider deactivating instead to preserve historical data.`)) return
     try {
+      // Pre-check for dependent records
+      const [{ count: secCount }, { count: stuCount }] = await Promise.all([
+        supabase.from('sections').select('id', { count: 'exact', head: true }).eq('specialisation_id', spec.id),
+        supabase.from('students').select('id', { count: 'exact', head: true }).eq('specialisation_id', spec.id),
+      ])
+      const deps = []
+      if (secCount > 0) deps.push(`${secCount} section(s)`)
+      if (stuCount > 0) deps.push(`${stuCount} student(s)`)
+      if (deps.length > 0) {
+        addToast(`Cannot delete "${spec.name}": still has ${deps.join(', ')}. Remove or reassign them first, or deactivate instead.`, 'error')
+        return
+      }
+
       const { error } = await supabase.from('specialisations').delete().eq('id', spec.id)
       if (error) throw error
       await logAction({
@@ -144,7 +157,7 @@ export default function SpecManager() {
       addToast('Specialisation deleted', 'success')
       refetchSpecialisations()
     } catch (err) {
-      addToast(err.message || 'Failed to delete. It may have dependent records.', 'error')
+      addToast(err.message || 'Failed to delete specialisation', 'error')
     }
   }
 
